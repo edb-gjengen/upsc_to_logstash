@@ -59,8 +59,14 @@ if __name__ == '__main__':
         'status': get_status(sys.argv[1])
     }
     json_output = json.dumps(output, indent=4)
-    r = requests.post(
-        settings.LOGSTASH_URL,
-        data=json_output, headers={'content-type':'application/json'},
-        auth=(settings.LOGSTASH_USER, settings.LOGSTASH_PASSWORD)
-    )
+    try:
+        r = requests.post(
+            settings.LOGSTASH_URL,
+            data=json_output, headers={'content-type':'application/json'},
+            auth=(settings.LOGSTASH_USER, settings.LOGSTASH_PASSWORD),
+            timeout=10
+        )
+    except requests.exceptions.Timeout as e:
+        print('Could not post data to logstash: {0}'.format(str(e)))
+        exit(2)
+
