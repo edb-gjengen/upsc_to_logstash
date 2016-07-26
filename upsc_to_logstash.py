@@ -9,7 +9,9 @@ import requests
 
 import settings
 
-def to_python(status):
+
+def to_python(raw_status):
+    status = OrderedDict()
     integer_fields = [
         "driver.parameter.pollinterval",
         "ups.delay.shutdown",
@@ -26,13 +28,14 @@ def to_python(status):
         "output.voltage",
         "ups.temperature"
     ]
-    for k,v in status.items():
+    for k,v in raw_status.items():
         if k in integer_fields:
             v = int(v)
         elif k in float_fields:
             v = float(v)
 
-        status[k] = v
+        allowed_key = k.replace('.', '_')
+        status[allowed_key] = v
 
     return status
 
